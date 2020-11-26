@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hzc.aams.modules.project.dao.AamsEstimateDao">
+
+    <sql id="aamsEstimateColumns">
+        a.id AS "id",
+        a.project_user_id AS "aamsProjectUser.id",
+        ea.id AS "oaEstimateApprove.id",
+        a.fraction AS "fraction",
+        a.evolve AS "evolve",
+        a.create_by AS "createBy.id",
+        a.create_date AS "createDate",
+        a.update_by AS "updateBy.id",
+        a.update_date AS "updateDate",
+        a.remarks AS "remarks",
+        a.del_flag AS "delFlag"
+    </sql>
+
+    <sql id="aamsEstimateJoins">
+        LEFT JOIN aams_project_user b ON b.id = a.project_user_id
+        LEFT JOIN oa_estimate_approve ea ON a.id = ea.estimate_id
+    </sql>
+
+    <select id="get" resultType="AamsEstimate">
+        SELECT
+        <include refid="aamsEstimateColumns"/>
+        FROM aams_estimate a
+        <include refid="aamsEstimateJoins"/>
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="findList" resultType="AamsEstimate">
+        SELECT
+        <include refid="aamsEstimateColumns"/>
+        FROM aams_estimate a
+        <include refid="aamsEstimateJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="aamsProjectUser != null and aamsProjectUser.id != null and aamsProjectUser.id != ''">
+                AND a.project_user_id = #{aamsProjectUser.id}
+            </if>
+            <if test="fraction != null and fraction != ''">
+                AND a.fraction = #{fraction}
+            </if>
+            <if test="evolve != null and evolve != ''">
+                AND a.evolve LIKE
+                <if test="dbName == 'oracle'">'%'||#{evolve}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{evolve}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{evolve},'%')</if>
+            </if>
+            <if test="beginUpdateDate != null and endUpdateDate != null and beginUpdateDate != '' and endUpdateDate != ''">
+                AND a.update_date BETWEEN #{beginUpdateDate} AND #{endUpdateDate}
+            </if>
+            <if test="remarks != null and remarks != ''">
+                AND a.remarks LIKE
+                <if test="dbName == 'oracle'">'%'||#{remarks}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{remarks}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{remarks},'%')</if>
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.create_date ASC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findAllList" resultType="AamsEstimate">
+        SELECT
+        <include refid="aamsEstimateColumns"/>
+        FROM aams_estimate a
+        <include refid="aamsEstimateJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.create_date ASC
+            </otherwise>
+        </choose>
+    </select>
+
+    <insert id="insert">
+        INSERT INTO aams_estimate(
+        id,
+        project_user_id,
+        fraction,
+        evolve,
+        create_by,
+        create_date,
+        update_by,
+        update_date,
+        remarks,
+        del_flag
+        ) VALUES (
+        #{id},
+        #{aamsProjectUser.id},
+        #{fraction},
+        #{evolve},
+        #{createBy.id},
+        #{createDate},
+        #{updateBy.id},
+        #{updateDate},
+        #{remarks},
+        #{delFlag}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE aams_estimate SET
+        project_user_id = #{aamsProjectUser.id},
+        fraction = #{fraction},
+        evolve = #{evolve},
+        remarks = #{remarks}
+        WHERE id = #{id}
+    </update>
+
+    <update id="delete">
+        UPDATE aams_estimate SET
+        del_flag = #{DEL_FLAG_DELETE}
+        <choose>
+            <when test="id !=null and id != ''">
+                WHERE id = #{id}
+            </when>
+            <otherwise>
+                WHERE project_user_id = #{aamsProjectUser.id}
+            </otherwise>
+        </choose>
+    </update>
+
+</mapper>

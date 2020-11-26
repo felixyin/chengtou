@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hzc.aams.modules.estimate.dao.UserEstimateDetailDao">
+    
+	<sql id="userEstimateDetailColumns">
+		distinct
+		a.id AS "id",
+		a.user_id AS "user.id",
+		a.company_id AS "companyId",
+		a.office_id AS "office.id",
+		a.login_name AS "loginName",
+		a.no AS "no",
+		a.name AS "name",
+		a.email AS "email",
+		a.mobile AS "mobile",
+		a.user_type AS "userType",
+		a.project_id AS "projectId",
+		a.fraction AS "fraction",
+		a.evolve AS "evolve",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.num AS "num",
+		a.level AS "level",
+		a.items AS "items",
+		a.source AS "source",
+		a.job_plain AS "jobPlain",
+		a.will_finish_time AS "willFinishTime",
+		a.estimate_time AS "estimateTime",
+		a.comments AS "comments",
+		a.end_time AS "endTime",
+		a.status AS "status",
+		u2.name AS "user.name",
+        /*b.name AS "user.name",*/
+		o4.name AS "office.name"
+	</sql>
+	
+	<sql id="userEstimateDetailJoins">
+		LEFT JOIN user_estimate b ON b.id = a.user_id
+		LEFT JOIN sys_user u2 ON u2.id = a.user_id
+		LEFT JOIN sys_office o4 ON o4.id = a.office_id
+	</sql>
+    
+	<select id="get" resultType="UserEstimateDetail">
+		SELECT 
+			<include refid="userEstimateDetailColumns"/>
+		FROM user_estimate_detail a
+		<include refid="userEstimateDetailJoins"/>
+		WHERE a.id = #{id} AND a.user_id = #{userId}
+	</select>
+	
+	<select id="findList" resultType="UserEstimateDetail">
+		SELECT 
+			<include refid="userEstimateDetailColumns"/>
+		FROM user_estimate_detail a
+		<include refid="userEstimateDetailJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="user != null and user.id != null and user.id != ''">
+				AND a.user_id = #{user.id}
+			</if>
+			<if test="office != null and office.id != null and office.id != ''">
+				AND a.office_id = #{office.id}
+			</if>
+			<if test="loginName != null and loginName != ''">
+				AND a.login_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{loginName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{loginName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{loginName},'%')</if>
+			</if>
+			<if test="no != null and no != ''">
+				AND a.no LIKE 
+					<if test="dbName == 'oracle'">'%'||#{no}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{no}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{no},'%')</if>
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="email != null and email != ''">
+				AND a.email LIKE 
+					<if test="dbName == 'oracle'">'%'||#{email}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{email}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{email},'%')</if>
+			</if>
+			<if test="mobile != null and mobile != ''">
+				AND a.mobile LIKE 
+					<if test="dbName == 'oracle'">'%'||#{mobile}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{mobile}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{mobile},'%')</if>
+			</if>
+			<if test="userType != null and userType != ''">
+				AND a.user_type = #{userType}
+			</if>
+			<if test="beginFraction != null and endFraction != null and beginFraction != '' and endFraction != ''">
+				AND a.fraction BETWEEN #{beginFraction} AND #{endFraction}
+			</if>
+			<if test="evolve != null and evolve != ''">
+				AND a.evolve LIKE 
+					<if test="dbName == 'oracle'">'%'||#{evolve}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{evolve}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{evolve},'%')</if>
+			</if>
+			<if test="beginUpdateDate != null and endUpdateDate != null and beginUpdateDate != '' and endUpdateDate != ''">
+				AND a.update_date BETWEEN #{beginUpdateDate} AND #{endUpdateDate}
+			</if>
+			<if test="remarks != null and remarks != ''">
+				AND a.remarks LIKE 
+					<if test="dbName == 'oracle'">'%'||#{remarks}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{remarks}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{remarks},'%')</if>
+			</if>
+			<if test="num != null and num != ''">
+				AND a.num LIKE 
+					<if test="dbName == 'oracle'">'%'||#{num}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{num}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{num},'%')</if>
+			</if>
+			<if test="level != null and level != '' and level != '-1'">
+                AND a.level = #{level}
+			</if>
+			<if test="items != null and items != ''">
+				AND a.items LIKE 
+					<if test="dbName == 'oracle'">'%'||#{items}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{items}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{items},'%')</if>
+			</if>
+			<if test="source != null and source != ''">
+				AND a.source LIKE 
+					<if test="dbName == 'oracle'">'%'||#{source}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{source}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{source},'%')</if>
+			</if>
+			<if test="jobPlain != null and jobPlain != ''">
+				AND a.job_plain LIKE 
+					<if test="dbName == 'oracle'">'%'||#{jobPlain}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{jobPlain}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{jobPlain},'%')</if>
+			</if>
+			<if test="willFinishTime != null and willFinishTime != ''">
+				AND a.will_finish_time LIKE 
+					<if test="dbName == 'oracle'">'%'||#{willFinishTime}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{willFinishTime}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{willFinishTime},'%')</if>
+			</if>
+			<if test="comments != null and comments != ''">
+				AND a.comments LIKE 
+					<if test="dbName == 'oracle'">'%'||#{comments}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{comments}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{comments},'%')</if>
+			</if>
+			<if test="beginEndTime != null and endEndTime != null and beginEndTime != '' and endEndTime != ''">
+				AND a.end_time BETWEEN #{beginEndTime} AND #{endEndTime}
+			</if>
+			<if test="status != null and status != '' and status != '-1'">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<!-- 数据范围过滤 -->
+		${sqlMap.dsf}
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="UserEstimateDetail">
+		SELECT 
+			<include refid="userEstimateDetailColumns"/>
+		FROM user_estimate_detail a
+		<include refid="userEstimateDetailJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO user_estimate_detail(
+			id,
+			user_id,
+			office_id,
+			login_name,
+			no,
+			name,
+			email,
+			mobile,
+			user_type,
+			project_id,
+			fraction,
+			evolve,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			num,
+			level,
+			items,
+			source,
+			job_plain,
+			will_finish_time,
+			comments,
+			end_time,
+			status
+		) VALUES (
+			#{id},
+			#{user.id},
+			#{office.id},
+			#{loginName},
+			#{no},
+			#{name},
+			#{email},
+			#{mobile},
+			#{userType},
+			#{projectId},
+			#{fraction},
+			#{evolve},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{num},
+			#{level},
+			#{items},
+			#{source},
+			#{jobPlain},
+			#{willFinishTime},
+			#{comments},
+			#{endTime},
+			#{status}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE user_estimate_detail SET 	
+			user_id = #{user.id},
+			office_id = #{office.id},
+			login_name = #{loginName},
+			no = #{no},
+			name = #{name},
+			email = #{email},
+			mobile = #{mobile},
+			user_type = #{userType},
+			project_id = #{projectId},
+			fraction = #{fraction},
+			evolve = #{evolve},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			num = #{num},
+			level = #{level},
+			items = #{items},
+			source = #{source},
+			job_plain = #{jobPlain},
+			will_finish_time = #{willFinishTime},
+			comments = #{comments},
+			end_time = #{endTime},
+			status = #{status}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE user_estimate_detail SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		<choose>
+			<when test="id !=null and id != ''">
+				WHERE id = #{id}
+			</when>
+			<otherwise>
+				WHERE user_id = #{user.id}
+			</otherwise>
+		</choose>
+	</update>
+	
+</mapper>

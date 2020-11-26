@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hzc.aams.modules.approve.dao.estimate.OaEstimateApproveDao">
+
+    <sql id="oaEstimateApproveColumns">
+        DISTINCT
+        a.id AS "id",
+        a.proc_ins_id AS "procInsId",
+        a.proc_ins_id AS "act.procInsId",
+        a.estimate_id AS "estimate.id",
+        IFNULL(a.old_fraction, ae.fraction) AS "estimate.fraction",
+        ae.evolve AS "estimate.evolve",
+        a.approve_user_id AS "approveUser.id",
+        u4.name AS "approveUser.name",
+        a.fraction_approve AS "fractionApprove",
+        a.reason AS "reason",
+        a.bumen_user_id AS "bumenUser.id",
+        u9.name AS "bumenUser.name",
+        a.bumen_suggest AS "bumenSuggest",
+        a.bumen_time AS "bumenTime",
+        a.admin_user_id AS "adminUser.id",
+        u12.name AS "adminUser.name",
+        a.admin_suggest AS "adminSuggest",
+        a.admin_time AS "adminTime",
+        a.leader_user_id AS "leaderUser.id",
+        u15.name AS "leaderUser.name",
+        a.leader_suggest AS "leaderSuggest",
+        a.leader_time AS "leaderTime",
+        a.boss_user_id AS "bossUser.id",
+        u18.name AS "bossUser.name",
+        a.boss_suggest AS "bossSuggest",
+        a.boss_time AS "bossTime",
+        a.boss_result AS "bossResult",
+        a.create_by AS "createBy.id",
+        a.create_date AS "createDate",
+        a.update_by AS "updateBy.id",
+        a.update_date AS "updateDate",
+        a.remarks AS "remarks",
+        a.del_flag AS "delFlag",
+        a.status AS "status"
+    </sql>
+
+    <sql id="oaEstimateApproveJoins">
+        LEFT JOIN aams_estimate ae ON a.estimate_id = ae.id
+        LEFT JOIN sys_user u4 ON u4.id = a.approve_user_id
+        LEFT JOIN sys_user u9 ON u9.id = a.bumen_user_id
+        LEFT JOIN sys_user u12 ON u12.id = a.admin_user_id
+        LEFT JOIN sys_user u15 ON u15.id = a.leader_user_id
+        LEFT JOIN sys_user u18 ON u18.id = a.boss_user_id
+        LEFT JOIN sys_office o1 ON u4.office_id = o1.id
+    </sql>
+
+    <select id="get" resultType="OaEstimateApprove">
+        SELECT
+        <include refid="oaEstimateApproveColumns"/>
+        FROM oa_estimate_approve a
+        <include refid="oaEstimateApproveJoins"/>
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="findList" resultType="OaEstimateApprove">
+        SELECT
+        <include refid="oaEstimateApproveColumns"/>
+        FROM oa_estimate_approve a
+        <include refid="oaEstimateApproveJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="estimate != null and estimate.id != null and estimate.id != ''">
+                AND a.estimate_id = #{estimate.id}
+            </if>
+            <if test="approveUser !=null and approveUser.id != null and approveUser.id !=''">
+                AND a.approve_user_id = #{approveUser.id}
+            </if>
+            <if test="fractionApprove != null and fractionApprove != ''">
+                AND a.fraction_approve = #{fractionApprove}
+            </if>
+            <if test="reason != null and reason != ''">
+                AND a.reason LIKE
+                <if test="dbName == 'oracle'">'%'||#{reason}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{reason}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{reason},'%')</if>
+            </if>
+            <if test="bumenUser != null and bumenUser.id != null and bumenUser.id != ''">
+                AND a.bumen_user_id = #{bumenUser.id}
+            </if>
+            <if test="bumenSuggest != null and bumenSuggest != ''">
+                AND a.bumen_suggest LIKE
+                <if test="dbName == 'oracle'">'%'||#{bumenSuggest}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{bumenSuggest}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{bumenSuggest},'%')</if>
+            </if>
+            <if test="bumenTime != null and bumenTime != ''">
+                AND a.bumen_time = #{bumenTime}
+            </if>
+            <if test="adminUser !=null and adminUser.id != null and adminUser.id != ''">
+                AND a.admin_user_id = #{adminUser.id}
+            </if>
+            <if test="adminSuggest != null and adminSuggest != ''">
+                AND a.admin_suggest LIKE
+                <if test="dbName == 'oracle'">'%'||#{adminSuggest}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{adminSuggest}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{adminSuggest},'%')</if>
+            </if>
+            <if test="adminTime != null and adminTime != ''">
+                AND a.admin_time = #{adminTime}
+            </if>
+            <if test="leaderUser !=null and leaderUser.id != null and leaderUser.id != ''">
+                AND a.leader_user_id = #{leaderUser.id}
+            </if>
+            <if test="leaderSuggest != null and leaderSuggest != ''">
+                AND a.leader_suggest LIKE
+                <if test="dbName == 'oracle'">'%'||#{leaderSuggest}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{leaderSuggest}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{leaderSuggest},'%')</if>
+            </if>
+            <if test="leaderTime != null and leaderTime != ''">
+                AND a.leader_time = #{leaderTime}
+            </if>
+            <if test="bossUser != null and bossUser.id != null and bossUser.id != ''">
+                AND a.boss_user_id = #{bossUser.id}
+            </if>
+            <if test="bossSuggest != null and bossSuggest != ''">
+                AND a.boss_suggest LIKE
+                <if test="dbName == 'oracle'">'%'||#{bossSuggest}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{bossSuggest}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{bossSuggest},'%')</if>
+            </if>
+            <if test="bossTime != null and bossTime != ''">
+                AND a.boss_time = #{bossTime}
+            </if>
+            <if test="bossResult != null and bossResult != ''">
+                AND a.boss_result = #{bossResult}
+            </if>
+            <if test="delFlag != null and delFlag != ''">
+                AND a.del_flag = #{delFlag}
+            </if>
+            <if test="status != null and status != ''">
+                AND a.status = #{status}
+            </if>
+        </where>
+        <!-- 数据范围过滤 -->
+        ${sqlMap.dsf}
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findAllList" resultType="OaEstimateApprove">
+        SELECT
+        <include refid="oaEstimateApproveColumns"/>
+        FROM oa_estimate_approve a
+        <include refid="oaEstimateApproveJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <insert id="insert">
+        INSERT INTO oa_estimate_approve (
+            id,
+            proc_ins_id,
+            estimate_id,
+            approve_user_id,
+            fraction_approve,
+            reason,
+            bumen_user_id,
+            bumen_suggest,
+            bumen_time,
+            admin_user_id,
+            admin_suggest,
+            admin_time,
+            leader_user_id,
+            leader_suggest,
+            leader_time,
+            boss_user_id,
+            boss_suggest,
+            boss_time,
+            boss_result,
+            create_by,
+            create_date,
+            update_by,
+            update_date,
+            remarks,
+            del_flag,
+            status
+        ) VALUES (
+            #{id},
+            #{procInsId},
+            #{estimate.id},
+            #{approveUser.id},
+            #{fractionApprove},
+            #{reason},
+            #{bumenUser.id},
+            #{bumenSuggest},
+            #{bumenTime},
+            #{adminUser.id},
+            #{adminSuggest},
+            #{adminTime},
+            #{leaderUser.id},
+            #{leaderSuggest},
+            #{leaderTime},
+            #{bossUser.id},
+            #{bossSuggest},
+            #{bossTime},
+            #{bossResult},
+            #{createBy.id},
+            #{createDate},
+            #{updateBy.id},
+            #{updateDate},
+            #{remarks},
+            #{delFlag},
+            #{status}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE oa_estimate_approve
+        SET
+            proc_ins_id      = #{procInsId},
+            estimate_id      = #{estimate.id},
+            approve_user_id  = #{approveUser.id},
+            old_fraction     = #{estimate.fraction},
+            fraction_approve = #{fractionApprove},
+            reason           = #{reason},
+            bumen_user_id    = #{bumenUser.id},
+            bumen_suggest    = #{bumenSuggest},
+            bumen_time       = #{bumenTime},
+            admin_user_id    = #{adminUser.id},
+            admin_suggest    = #{adminSuggest},
+            admin_time       = #{adminTime},
+            leader_user_id   = #{leaderUser.id},
+            leader_suggest   = #{leaderSuggest},
+            leader_time      = #{leaderTime},
+            boss_user_id     = #{bossUser.id},
+            boss_suggest     = #{bossSuggest},
+            boss_time        = #{bossTime},
+            boss_result      = #{bossResult},
+            update_by        = #{updateBy.id},
+            update_date      = #{updateDate},
+            remarks          = #{remarks},
+            status           = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <update id="delete">
+        UPDATE oa_estimate_approve
+        SET
+            del_flag = #{DEL_FLAG_DELETE}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateProcessInstanceId">
+        UPDATE oa_estimate_approve
+        SET
+            proc_ins_id = #{procInsId}
+        WHERE id = #{id}
+    </update>
+
+</mapper>

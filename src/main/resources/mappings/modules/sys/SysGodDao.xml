@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hzc.aams.modules.sys.dao.SysGodDao">
+    
+	<sql id="sysGodColumns">
+		a.id AS "id",
+		a.day_count AS "dayCount"
+	</sql>
+	
+	<sql id="sysGodJoins">
+	</sql>
+    
+	<select id="get" resultType="SysGod">
+		SELECT 
+			<include refid="sysGodColumns"/>
+		FROM sys_god a
+		<include refid="sysGodJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="SysGod">
+		SELECT 
+			<include refid="sysGodColumns"/>
+		FROM sys_god a
+		<include refid="sysGodJoins"/>
+		<where>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="SysGod">
+		SELECT 
+			<include refid="sysGodColumns"/>
+		FROM sys_god a
+		<include refid="sysGodJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO sys_god(
+			id,
+			day_count
+		) VALUES (
+			#{id},
+			#{dayCount}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE sys_god SET 	
+			day_count = #{dayCount}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM sys_god
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

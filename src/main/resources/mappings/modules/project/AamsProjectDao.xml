@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hzc.aams.modules.project.dao.AamsProjectDao">
+
+    <sql id="aamsProjectColumns">
+        a.id AS "id",
+        a.type AS "type",
+        a.num AS "num",
+        a.level AS "level",
+        a.items AS "items",
+        a.source AS "source",
+        a.office_id AS "office.id",
+        group_concat(u7.name) AS `userNames`,
+        a.job_plain AS "jobPlain",
+        a.will_finish_time AS "willFinishTime",
+        a.evolve AS "evolve",
+        a.estimate AS "estimate",
+        a.estimate_time AS "estimateTime",
+        a.comments AS "comments",
+        a.end_time AS "endTime",
+        a.files AS "files",
+        a.order_num AS "orderNum",
+        a.status AS "status",
+        a.create_by AS "createBy.id",
+        a.create_date AS "createDate",
+        a.update_by AS "updateBy.id",
+        a.update_date AS "updateDate",
+        a.remarks AS "remarks",
+        a.del_flag AS "delFlag",
+        o6.name AS "office.name"
+    </sql>
+
+    <sql id="aamsProjectJoins">
+        LEFT JOIN sys_office o6 ON o6.id = a.office_id
+        LEFT JOIN aams_project_user pu ON a.id = pu.project_id
+        LEFT JOIN sys_user u7 ON pu.user_id = u7.id
+    </sql>
+
+    <select id="get" resultType="AamsProject">
+        SELECT
+        <include refid="aamsProjectColumns"/>
+        FROM aams_project a
+        <include refid="aamsProjectJoins"/>
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="findList" resultType="AamsProject">
+        SELECT
+        <include refid="aamsProjectColumns"/>
+        FROM aams_project a
+        <include refid="aamsProjectJoins"/>
+        <where>
+            1 = 1
+            <if test="type != null and type != ''">
+                AND a.type = #{type}
+            </if>
+            <if test="num != null and num != ''">
+                AND a.num LIKE
+                <if test="dbName == 'oracle'">'%'||#{num}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{num}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{num},'%')</if>
+            </if>
+            <if test="level != null and level != '' and level != '-1'">
+                AND a.level = #{level}
+            </if>
+            <if test="items != null and items != ''">
+                AND a.items LIKE
+                <if test="dbName == 'oracle'">'%'||#{items}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{items}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{items},'%')</if>
+            </if>
+            <if test="source != null and source != ''">
+                AND a.source LIKE
+                <if test="dbName == 'oracle'">'%'||#{source}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{source}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{source},'%')</if>
+            </if>
+            <if test="office != null and office.id != null and office.id != ''">
+                AND a.office_id = #{office.id}
+            </if>
+            <if test="userNames !=null and userNames != ''">
+                AND u7.name LIKE
+                <if test="dbName == 'oracle'">'%'||#{userNames}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{userNames}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{userNames},'%')</if>
+            </if>
+            <if test="jobPlain != null and jobPlain != ''">
+                AND a.job_plain LIKE
+                <if test="dbName == 'oracle'">'%'||#{jobPlain}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{jobPlain}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{jobPlain},'%')</if>
+            </if>
+            <if test="beginWillFinishTime != null and endWillFinishTime != null and beginWillFinishTime != '' and endWillFinishTime != ''">
+                AND a.will_finish_time BETWEEN #{beginWillFinishTime} AND #{endWillFinishTime}
+            </if>
+            <if test="evolve != null and evolve != ''">
+                AND a.evolve LIKE
+                <if test="dbName == 'oracle'">'%'||#{evolve}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{evolve}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{evolve},'%')</if>
+            </if>
+            <if test="estimate != null and estimate != ''">
+                AND a.estimate LIKE
+                <if test="dbName == 'oracle'">'%'||#{estimate}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{estimate}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{estimate},'%')</if>
+            </if>
+            <if test="beginEstimateTime != null and endEstimateTime != null and beginEstimateTime != '' and endEstimateTime != ''">
+                AND a.estimate_time BETWEEN #{beginEstimateTime} AND #{endEstimateTime}
+            </if>
+            <if test="comments != null and comments != ''">
+                AND a.comments LIKE
+                <if test="dbName == 'oracle'">'%'||#{comments}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{comments}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{comments},'%')</if>
+            </if>
+            <if test="beginEndTime != null and endEndTime != null and beginEndTime != '' and endEndTime != ''">
+                AND a.end_time BETWEEN #{beginEndTime} AND #{endEndTime}
+            </if>
+            <if test="status != null and status != '' and status != '-1'">
+                AND a.status = #{status}
+            </if>
+            <if test="updateBy != null and updateBy.id != null and updateBy.id != ''">
+                AND a.update_by = #{updateBy.id}
+            </if>
+            <if test="beginUpdateDate != null and endUpdateDate != null and beginUpdateDate != '' and endUpdateDate != ''">
+                AND a.update_date BETWEEN #{beginUpdateDate} AND #{endUpdateDate}
+            </if>
+            <if test="delFlag != null and delFlag != ''">
+                AND a.del_flag = #{delFlag}
+            </if>
+        </where>
+        <!-- 数据范围过滤 -->
+        ${sqlMap.dsf}
+        group by `id`,
+        `type`,
+        `num`,
+        `level`,
+        `items`,
+        `source`,
+        `office.id`,
+        `jobPlain`,
+        `willFinishTime`,
+        `evolve`,
+        `estimate`,
+        `estimateTime`,
+        `comments`,
+        `endTime`,
+        `files`,
+        `orderNum`,
+        `status`,
+        `createBy.id`,
+        `createDate`,
+        `updateBy.id`,
+        `updateDate`,
+        `remarks`,
+        `delFlag`,
+        `office.name`
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}, a.order_num ASC
+            </when>
+            <otherwise>
+                ORDER BY a.order_num ASC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findAllList" resultType="AamsProject">
+        SELECT
+        <include refid="aamsProjectColumns"/>
+        FROM aams_project a
+        <include refid="aamsProjectJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <insert id="insert">
+        INSERT INTO aams_project (
+            id,
+            type,
+            num,
+            level,
+            items,
+            source,
+            office_id,
+            job_plain,
+            will_finish_time,
+            evolve,
+            comments,
+            end_time,
+            files,
+            status,
+            create_by,
+            create_date,
+            update_by,
+            update_date,
+            del_flag
+        ) VALUES (
+            #{id},
+            #{type},
+            #{num},
+            #{level},
+            #{items},
+            #{source},
+            #{office.id},
+            #{jobPlain},
+            #{willFinishTime},
+            #{evolve},
+            #{comments},
+            #{endTime},
+            #{files},
+            #{status},
+            #{createBy.id},
+            #{createDate},
+            #{updateBy.id},
+            #{updateDate},
+            #{delFlag}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE aams_project
+        SET
+            type = #{type},
+            level            = #{level},
+            items            = #{items},
+            source           = #{source},
+            office_id        = #{office.id},
+            job_plain        = #{jobPlain},
+            will_finish_time = #{willFinishTime},
+            evolve           = #{evolve},
+            comments         = #{comments},
+            end_time         = #{endTime},
+            files            = #{files},
+            order_num        = #{orderNum},
+            status           = #{status},
+            update_by        = #{updateBy.id},
+            update_date      = #{updateDate},
+            del_flag         = #{delFlag}
+        WHERE id = #{id}
+    </update>
+
+    <update id="delete">
+        UPDATE aams_project
+        SET
+            del_flag = #{DEL_FLAG_DELETE}
+        WHERE id = #{id}
+    </update>
+
+</mapper>

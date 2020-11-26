@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hzc.aams.modules.estimate.dao.UserEstimateDao">
+
+    <sql id="userEstimateColumns">
+        a.id AS "id",
+        a.company_id AS "companyId",
+        a.office_id AS "office.id",
+        a.login_name AS "loginName",
+        a.no AS "no",
+        a.name AS "name",
+        a.email AS "email",
+        a.mobile AS "mobile",
+        a.user_type AS "userType",
+        a.year AS "year",
+        a.fraction AS "fraction",
+        a.attenFraction AS "attenFraction",
+        a.zongFraction AS "zongFraction",
+        a.fractionRatio AS "fractionRatio",
+        o3.name AS "office.name"
+    </sql>
+
+    <sql id="userEstimateJoins">
+        INNER JOIN sys_office o3 ON o3.id = a.office_id
+        /* 		left join aams_project_user pu on a.id = pu.project_id
+                 left join sys_user u7 on pu.user_id = u7.id */
+    </sql>
+
+    <select id="getSumFractionRatio" resultType="double">
+        SELECT
+        sum(a.fractionRatio) AS "sumFractionRatio"
+        FROM user_estimate a
+        <where>
+
+            <if test="year != null and year != ''">
+                AND a.year = #{year}
+            </if>
+        </where>
+    </select>
+
+    <select id="get" resultType="UserEstimate">
+        SELECT
+        <include refid="userEstimateColumns"/>
+        FROM user_estimate a
+        <include refid="userEstimateJoins"/>
+        WHERE  a.id = #{id}
+        <if test="year != null and year != ''">
+            AND a.YEAR = DATE_FORMAT(#{year} , '%Y' )
+        </if>
+    </select>
+
+    <select id="getByIdYear" resultType="com.hzc.aams.modules.estimate.entity.UserEstimate">
+        SELECT
+        <include refid="userEstimateColumns"/>
+        FROM user_estimate a
+        <include refid="userEstimateJoins"/>
+        WHERE  a.id = #{id}
+        <if test="year != null and year != ''">
+            AND a.YEAR = #{year}
+        </if>
+    </select>
+
+    <select id="findList" resultType="UserEstimate">
+        SELECT
+        <include refid="userEstimateColumns"/>
+        FROM user_estimate a
+        <include refid="userEstimateJoins"/>
+        <where>
+
+            <if test="office != null and office.id != null and office.id != ''">
+                AND a.office_id = #{office.id}
+            </if>
+            <if test="loginName != null and loginName != ''">
+                AND a.login_name LIKE
+                <if test="dbName == 'oracle'">'%'||#{loginName}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{loginName}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{loginName},'%')</if>
+            </if>
+            <if test="no != null and no != ''">
+                AND a.no LIKE
+                <if test="dbName == 'oracle'">'%'||#{no}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{no}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{no},'%')</if>
+            </if>
+            <if test="name != null and name != ''">
+                AND a.name LIKE
+                <if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+            </if>
+            <if test="email != null and email != ''">
+                AND a.email LIKE
+                <if test="dbName == 'oracle'">'%'||#{email}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{email}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{email},'%')</if>
+            </if>
+            <if test="mobile != null and mobile != ''">
+                AND a.mobile LIKE
+                <if test="dbName == 'oracle'">'%'||#{mobile}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{mobile}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{mobile},'%')</if>
+            </if>
+            <if test="userType != null and userType != ''">
+                AND a.user_type = #{userType}
+            </if>
+            <if test="year != null and year != ''">
+                AND a.year = #{year}
+            </if>
+        </where>
+        <!-- 数据范围过滤 -->
+        ${sqlMap.dsf}
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findAllList" resultType="UserEstimate">
+        SELECT
+        <include refid="userEstimateColumns"/>
+        FROM user_estimate a
+        <include refid="userEstimateJoins"/>
+        <where>
+
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+            </otherwise>
+        </choose>
+    </select>
+
+
+    <insert id="insert">
+        INSERT INTO user_estimate (
+            id,
+            office_id,
+            login_name,
+            no,
+            name,
+            email,
+            mobile,
+            user_type,
+            fraction
+        ) VALUES (
+            #{id},
+            #{office.id},
+            #{loginName},
+            #{no},
+            #{name},
+            #{email},
+            #{mobile},
+            #{userType},
+            #{fraction}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE user_estimate
+        SET
+            office_id  = #{office.id},
+            login_name = #{loginName},
+            no         = #{no},
+            name       = #{name},
+            email      = #{email},
+            mobile     = #{mobile},
+            user_type  = #{userType},
+            fraction   = #{fraction}
+        WHERE id = #{id}
+    </update>
+
+    <update id="delete">
+        DELETE FROM user_estimate
+        WHERE id = #{id}
+    </update>
+
+</mapper>
